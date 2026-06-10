@@ -157,10 +157,12 @@ function PrintContent() {
     const hour = parseInt(time.split(':')[0], 10);
 
     if (prevHour !== null && hour !== prevHour) {
-      // Single thick bold line for hourly separator (one line only)
+      // 굵은 선 하나로만 시간 단위 구분 (단일 tr, inner div로 깔끔한 한 줄)
       tableRows.push(
         <tr key={`hour-${index}`}>
-          <td colSpan={4} className="border-t-4 border-gray-400 py-1"></td>
+          <td colSpan={4} className="p-0 border-0">
+            <div className="border-t-4 border-gray-400" />
+          </td>
         </tr>
       );
     }
@@ -171,28 +173,28 @@ function PrintContent() {
     if (slotRes.length === 0) {
       tableRows.push(
         <tr key={time} className="align-top">
-          <td className="border border-gray-300 px-3 py-2.5 font-mono text-[11pt]">
+          <td className="w-[15%] border border-gray-300 px-3 py-2.5 font-mono text-[11pt]">
             {time}
           </td>
-          <td className="w-28 border border-gray-300 px-3 py-2.5"></td>
-          <td className="w-20 border border-gray-300 px-3 py-2.5"></td>
-          <td className="w-16 border border-gray-300 px-3 py-2.5"></td>
+          <td className="w-[20%] border border-gray-300 px-3 py-2.5"></td>
+          <td className="w-[15%] border border-gray-300 px-3 py-2.5"></td>
+          <td className="w-[50%] border border-gray-300 px-3 py-2.5"></td>
         </tr>
       );
     } else {
       slotRes.forEach((res, idx) => {
         tableRows.push(
           <tr key={res.id} className="align-top">
-            <td className="border border-gray-300 px-3 py-2.5 font-mono text-[11pt]">
+            <td className="w-[15%] border border-gray-300 px-3 py-2.5 font-mono text-[11pt]">
               {idx === 0 ? time : ""}
             </td>
-            <td className="w-28 border border-gray-300 px-3 py-2.5">
+            <td className="w-[20%] border border-gray-300 px-3 py-2.5">
               {res.patientName}
             </td>
-            <td className="w-20 border border-gray-300 px-3 py-2.5">
+            <td className="w-[15%] border border-gray-300 px-3 py-2.5">
               {res.treatment}
             </td>
-            <td className="w-16 border border-gray-300 px-3 py-2.5">
+            <td className="w-[50%] border border-gray-300 px-3 py-2.5">
               {res.symptom}
             </td>
           </tr>
@@ -241,16 +243,16 @@ function PrintContent() {
         <table className="w-full border-collapse border border-gray-400 text-[11pt]">
           <thead>
             <tr className="bg-gray-100">
-              <th className="w-[68px] border border-gray-400 px-3 py-2.5 text-left font-medium">
+              <th className="w-[15%] border border-gray-400 px-3 py-2.5 text-left font-medium">
                 시간
               </th>
-              <th className="w-28 border border-gray-400 px-3 py-2.5 text-left font-medium">
+              <th className="w-[20%] border border-gray-400 px-3 py-2.5 text-left font-medium">
                 환자명
               </th>
-              <th className="w-20 border border-gray-400 px-3 py-2.5 text-left font-medium">
+              <th className="w-[15%] border border-gray-400 px-3 py-2.5 text-left font-medium">
                 진료내역
               </th>
-              <th className="w-16 border border-gray-400 px-3 py-2.5 text-left font-medium">
+              <th className="w-[50%] border border-gray-400 px-3 py-2.5 text-left font-medium">
                 기타
               </th>
             </tr>
