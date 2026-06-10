@@ -144,7 +144,7 @@ function PrintContent() {
           <td colSpan={4} className="border-t-2 border-b border-gray-400 py-0"></td>
         </tr>,
         <tr key={`am-pm-2-${index}`}>
-          <td colSpan={4} className="border-t border-b-2 border-gray-400 py-0 text-center text-[7pt] text-gray-500">
+          <td colSpan={4} className="border-t border-b-2 border-gray-400 py-0 text-center text-[8pt] text-gray-500">
             오후 진료
           </td>
         </tr>
@@ -157,13 +157,10 @@ function PrintContent() {
     const hour = parseInt(time.split(':')[0], 10);
 
     if (prevHour !== null && hour !== prevHour) {
-      // Two-line hourly divider for easy hour separation
+      // Single thick line for hourly separator
       tableRows.push(
-        <tr key={`hour-1-${index}`}>
-          <td colSpan={4} className="border-t-2 border-b border-gray-300 py-0"></td>
-        </tr>,
-        <tr key={`hour-2-${index}`}>
-          <td colSpan={4} className="border-t border-b-2 border-gray-300 py-0"></td>
+        <tr key={`hour-${index}`}>
+          <td colSpan={4} className="border-t-[3px] border-gray-400 py-1"></td>
         </tr>
       );
     }
@@ -174,11 +171,11 @@ function PrintContent() {
     if (slotRes.length === 0) {
       tableRows.push(
         <tr key={time} className="align-top">
-          <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
+          <td className="border border-gray-300 px-3 py-2.5 font-mono text-[11pt]">
             {time}
           </td>
-          <td className="w-20 border border-gray-300 px-3 py-2.5"></td>
           <td className="border border-gray-300 px-3 py-2.5"></td>
+          <td className="w-20 border border-gray-300 px-3 py-2.5"></td>
           <td className="border border-gray-300 px-3 py-2.5"></td>
         </tr>
       );
@@ -186,13 +183,13 @@ function PrintContent() {
       slotRes.forEach((res, idx) => {
         tableRows.push(
           <tr key={res.id} className="align-top">
-            <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
+            <td className="border border-gray-300 px-3 py-2.5 font-mono text-[11pt]">
               {idx === 0 ? time : ""}
             </td>
-            <td className="w-20 border border-gray-300 px-3 py-2.5">
+            <td className="border border-gray-300 px-3 py-2.5">
               {res.patientName}
             </td>
-            <td className="border border-gray-300 px-3 py-2.5">
+            <td className="w-20 border border-gray-300 px-3 py-2.5">
               {res.treatment}
             </td>
             <td className="border border-gray-300 px-3 py-2.5">
@@ -205,7 +202,7 @@ function PrintContent() {
   });
 
   return (
-    <div className="min-h-screen bg-white p-8 font-sans text-[10pt] leading-tight print:p-2 print:pt-1 print:pb-3 print:m-0">
+    <div className="min-h-screen bg-white p-8 font-sans text-[11pt] leading-tight print:p-2 print:pt-1 print:pb-3 print:m-0">
       {/* Screen controls - hidden when printing */}
       <div className="mb-6 flex items-center justify-between print:hidden">
         <div>
@@ -241,16 +238,16 @@ function PrintContent() {
         </div>
 
         {/* Single unified table for the entire day (consistent column widths) */}
-        <table className="w-full border-collapse border border-gray-400 text-[10pt]">
+        <table className="w-full border-collapse border border-gray-400 text-[11pt]">
           <thead>
             <tr className="bg-gray-100">
               <th className="w-[68px] border border-gray-400 px-3 py-2.5 text-left font-medium">
                 시간
               </th>
-              <th className="w-20 border border-gray-400 px-3 py-2.5 text-left font-medium">
+              <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
                 환자명
               </th>
-              <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
+              <th className="w-20 border border-gray-400 px-3 py-2.5 text-left font-medium">
                 진료내역
               </th>
               <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
@@ -263,7 +260,7 @@ function PrintContent() {
           </tbody>
         </table>
 
-        <div className="mt-3 print:mt-1 text-center text-[9pt] text-gray-500">
+        <div className="mt-3 print:mt-1 text-center text-[10pt] text-gray-500">
           본 시간표는 내부 참고용입니다.
         </div>
       </div>
