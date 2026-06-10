@@ -131,6 +131,79 @@ function PrintContent() {
     );
   }
 
+  // Build flat list of rows for the single table.
+  // Insert a two-line (double border) separator before each new hour.
+  const tableRows: React.ReactNode[] = [];
+  let prevHour: number | null = null;
+
+  displayItems.forEach((item, index) => {
+    if (typeof item === 'object' && item.type === 'divider') {
+      // AM/PM separator (keep the existing two-line with label)
+      tableRows.push(
+        <tr key={`am-pm-1-${index}`}>
+          <td colSpan={4} className="border-t-2 border-b border-gray-400 py-0"></td>
+        </tr>,
+        <tr key={`am-pm-2-${index}`}>
+          <td colSpan={4} className="border-t border-b-2 border-gray-400 py-0 text-center text-[7pt] text-gray-500">
+            오후 진료
+          </td>
+        </tr>
+      );
+      prevHour = null;
+      return;
+    }
+
+    const time = item as string;
+    const hour = parseInt(time.split(':')[0], 10);
+
+    if (prevHour !== null && hour !== prevHour) {
+      // Two-line hourly divider for easy hour separation
+      tableRows.push(
+        <tr key={`hour-1-${index}`}>
+          <td colSpan={4} className="border-t-2 border-b border-gray-300 py-0"></td>
+        </tr>,
+        <tr key={`hour-2-${index}`}>
+          <td colSpan={4} className="border-t border-b-2 border-gray-300 py-0"></td>
+        </tr>
+      );
+    }
+
+    prevHour = hour;
+
+    const slotRes = dailyReservations.filter((r) => r.time === time);
+    if (slotRes.length === 0) {
+      tableRows.push(
+        <tr key={time} className="align-top">
+          <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
+            {time}
+          </td>
+          <td className="w-20 border border-gray-300 px-3 py-2.5"></td>
+          <td className="border border-gray-300 px-3 py-2.5"></td>
+          <td className="border border-gray-300 px-3 py-2.5"></td>
+        </tr>
+      );
+    } else {
+      slotRes.forEach((res, idx) => {
+        tableRows.push(
+          <tr key={res.id} className="align-top">
+            <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
+              {idx === 0 ? time : ""}
+            </td>
+            <td className="w-20 border border-gray-300 px-3 py-2.5">
+              {res.patientName}
+            </td>
+            <td className="border border-gray-300 px-3 py-2.5">
+              {res.treatment}
+            </td>
+            <td className="border border-gray-300 px-3 py-2.5">
+              {res.symptom}
+            </td>
+          </tr>
+        );
+      });
+    }
+  });
+
   return (
     <div className="min-h-screen bg-white p-8 font-sans text-[10pt] leading-tight print:p-2 print:pt-1 print:pb-3 print:m-0">
       {/* Screen controls - hidden when printing */}
@@ -186,54 +259,7 @@ function PrintContent() {
             </tr>
           </thead>
           <tbody>
-            {displayItems.map((item, index) => {
-              if (typeof item === 'object' && item.type === 'divider') {
-                // Two-line divider to separate 오전 and 오후 (no separate tables)
-                return (
-                  <React.Fragment key={`divider-${index}`}>
-                    <tr>
-                      <td colSpan={4} className="border-t-2 border-b border-gray-400 py-0"></td>
-                    </tr>
-                    <tr>
-                      <td colSpan={4} className="border-t border-b-2 border-gray-400 py-0 text-center text-[7pt] text-gray-500">
-                        오후 진료
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              }
-
-              const time = item as string;
-              const slotRes = dailyReservations.filter((r) => r.time === time);
-              if (slotRes.length === 0) {
-                return (
-                  <tr key={time} className="align-top">
-                    <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
-                      {time}
-                    </td>
-                    <td className="w-20 border border-gray-300 px-3 py-2.5"></td>
-                    <td className="border border-gray-300 px-3 py-2.5"></td>
-                    <td className="border border-gray-300 px-3 py-2.5"></td>
-                  </tr>
-                );
-              }
-              return slotRes.map((res, idx) => (
-                <tr key={res.id} className="align-top">
-                  <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
-                    {idx === 0 ? time : ""}
-                  </td>
-                  <td className="w-20 border border-gray-300 px-3 py-2.5">
-                    {res.patientName}
-                  </td>
-                  <td className="border border-gray-300 px-3 py-2.5">
-                    {res.treatment}
-                  </td>
-                  <td className="border border-gray-300 px-3 py-2.5">
-                    {res.symptom}
-                  </td>
-                </tr>
-              ));
-            })}
+            {tableRows}
           </tbody>
         </table>
 
