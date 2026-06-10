@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Plus,
-  Search,
   Download,
   Calendar,
   Clock,
@@ -308,7 +307,6 @@ export default function HanuiwonReservationApp() {
   const [selectedDate, setSelectedDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
 
   // Filters (scoped to the selected day; status distinction removed)
-  const [searchTerm, setSearchTerm] = useState("");
   const [supabaseStatus, setSupabaseStatus] = useState<'checking' | 'connected' | 'fallback'>('checking');
 
   // Modals
@@ -409,19 +407,11 @@ export default function HanuiwonReservationApp() {
   const dailyReservations = useMemo(() => {
     let result = reservations.filter((r) => r.date === selectedDate);
 
-    // Text search (within the day)
-    if (searchTerm.trim()) {
-      const q = searchTerm.trim().toLowerCase();
-      result = result.filter((r) =>
-        r.patientName.toLowerCase().includes(q)
-      );
-    }
-
     // Sort by time ascending (morning first)
     result.sort((a, b) => a.time.localeCompare(b.time));
 
     return result;
-  }, [reservations, selectedDate, searchTerm]);
+  }, [reservations, selectedDate]);
 
   // Time slots for the schedule table (as requested)
   const isSaturday = getDay(parseISO(selectedDate)) === 6;
@@ -501,24 +491,20 @@ export default function HanuiwonReservationApp() {
   function goToPrevDay() {
     const prev = format(subDays(parseISO(selectedDate), 1), "yyyy-MM-dd");
     setSelectedDate(prev);
-    setSearchTerm("");
   }
 
   function goToNextDay() {
     const next = format(addDays(parseISO(selectedDate), 1), "yyyy-MM-dd");
     setSelectedDate(next);
-    setSearchTerm("");
   }
 
   function goToToday() {
     const todayStr = format(new Date(), "yyyy-MM-dd");
     setSelectedDate(todayStr);
-    setSearchTerm("");
   }
 
   function changeSelectedDate(newDate: string) {
     setSelectedDate(newDate);
-    setSearchTerm("");
   }
 
   // Open add modal (prefill with currently selected day)
@@ -707,7 +693,6 @@ export default function HanuiwonReservationApp() {
     }
 
     setReservations(seed);
-    setSearchTerm("");
     setSelectedDate(format(new Date(), "yyyy-MM-dd"));
     toast.info("데이터가 초기화되었습니다.");
   }
@@ -823,11 +808,7 @@ export default function HanuiwonReservationApp() {
             <span className="font-normal">Vercel 대시보드 → Project → Settings → Environment Variables 에서 NEXT_PUBLIC_SUPABASE_URL과 NEXT_PUBLIC_SUPABASE_ANON_KEY를 <strong>Production</strong> 환경에 추가하고 Sensitive 체크를 해제한 후 반드시 Redeploy 하세요.</span>
           </div>
         )}
-        {supabaseStatus === 'connected' && (
-          <div className="mb-3 p-2 bg-green-600 text-white rounded text-xs text-center font-medium">
-            ✅ Supabase 연동 완료 (모든 데이터가 DB에 저장되며 여러 기기에서 공유됩니다)
-          </div>
-        )}
+
 
         {/* Page Title - simplified */}
         <div className="mb-5">
@@ -891,24 +872,7 @@ export default function HanuiwonReservationApp() {
           <div className="px-3 py-1 bg-white border rounded-full text-slate-600">오늘 <span className="font-semibold text-slate-900">{dayStats.total}</span>건</div>
         </div>
 
-        {/* Simple filters for the day (search only, no status) */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-4 no-print">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="환자명 검색"
-              className="input pl-10 h-10"
-            />
-            {searchTerm && (
-              <button onClick={() => setSearchTerm("")} className="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
+
 
         {/* Time-based Schedule Table */}
         {/* Print-only header - shows nicely when printing */}
@@ -926,24 +890,10 @@ export default function HanuiwonReservationApp() {
             Vercel 대시보드에서 NEXT_PUBLIC_SUPABASE_URL과 NEXT_PUBLIC_SUPABASE_ANON_KEY를 <strong>Production</strong> 환경에 추가하고 "Sensitive" 체크를 해제한 후 재배포하세요.
           </div>
         )}
-        {supabaseStatus === 'connected' && (
-          <div className="mb-2 p-1 bg-green-600 text-white rounded text-xs text-center">
-            ✅ Supabase 연동 중 (데이터가 DB에 저장됩니다)
-          </div>
-        )}
-
-        <div className="mb-2 px-1 flex items-center justify-between">
+        <div className="mb-2 px-1">
           <div className="text-sm font-medium text-slate-600">
             진료 시간표
           </div>
-          <button
-            onClick={() => {
-              setSearchTerm("");
-            }}
-            className="text-xs text-slate-400 hover:text-slate-600"
-          >
-            필터 초기화
-          </button>
         </div>
 
         {sections.map((section, index) => (
