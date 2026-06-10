@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { format, parseISO, addDays, subDays, startOfMonth, endOfMonth, addMonths, subMonths, getDay } from "date-fns";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 // Types
 type Status = "pending" | "confirmed" | "completed" | "cancelled";
@@ -308,6 +309,7 @@ export default function HanuiwonReservationApp() {
 
   // Filters (scoped to the selected day; status distinction removed)
   const [searchTerm, setSearchTerm] = useState("");
+  const [supabaseStatus, setSupabaseStatus] = useState<'checking' | 'connected' | 'fallback'>('checking');
 
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -328,32 +330,79 @@ export default function HanuiwonReservationApp() {
     symptom: "",
   });
 
-  // Load from localStorage or seed
+  // Helper to convert Supabase row (snake_case columns) to our camelCase Reservation type
+  function mapSupabaseRow(row: any): Reservation {
+    return {
+      id: row.id,
+      date: row.date,
+      time: row.time,
+      patientName: row.patient_name,
+      phone: row.phone || '',
+      birthDate: row.birth_date || '',
+      gender: (row.gender as '남' | '여') || '여',
+      doctor: row.doctor || '',
+      treatment: row.treatment,
+      symptom: row.symptom,
+      status: row.status as Status,
+      notes: row.notes || undefined,
+      createdAt: row.created_at,
+    };
+  }
+
+  // Load from Supabase
   useEffect(() => {
-    const saved = localStorage.getItem("hanui_reservations");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as Reservation[];
-        setReservations(parsed);
-      } catch {
+    // Debug: see what Supabase URL the client bundle is using (very useful on Vercel)
+    console.log('Supabase runtime config:', {
+      url: process.env.NEXT_PUBLIC_SUPABASE_URL || 'using placeholder (env var not present at build time)',
+    });
+
+    const loadReservations = async () => {
+      const { data, error } = await supabase
+        .from("reservations")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error loading reservations from Supabase:", error);
         const seed = generateSeedData();
         setReservations(seed);
-        localStorage.setItem("hanui_reservations", JSON.stringify(seed));
+        setSupabaseStatus('fallback');
+        setIsLoaded(true);
+        return;
       }
-    } else {
-      const seed = generateSeedData();
-      setReservations(seed);
-      localStorage.setItem("hanui_reservations", JSON.stringify(seed));
-    }
-    setIsLoaded(true);
-  }, []);
 
-  // Persist on change
-  useEffect(() => {
-    if (isLoaded && reservations.length > 0) {
-      localStorage.setItem("hanui_reservations", JSON.stringify(reservations));
-    }
-  }, [reservations, isLoaded]);
+      if (data && data.length > 0) {
+        setReservations(data.map(mapSupabaseRow));
+        setSupabaseStatus('connected');
+      } else {
+        // First time: insert seed data to Supabase
+        const seed = generateSeedData();
+        const { error: insertError } = await supabase.from("reservations").insert(
+          seed.map((s) => ({
+            date: s.date,
+            time: s.time,
+            patient_name: s.patientName,
+            phone: s.phone,
+            birth_date: s.birthDate,
+            gender: s.gender,
+            doctor: s.doctor,
+            treatment: s.treatment,
+            symptom: s.symptom,
+            status: s.status,
+            notes: s.notes,
+          }))
+        );
+        if (insertError) {
+          console.error("Seed insert error:", insertError);
+        }
+        setReservations(seed.map(mapSupabaseRow));
+        setSupabaseStatus('connected');
+      }
+      setIsLoaded(true);
+    };
+
+    loadReservations();
+  }, []);
 
   // Daily reservations for the selected date (sorted by time ascending - schedule order)
   // Status distinction removed; only search filter remains
@@ -525,8 +574,8 @@ export default function HanuiwonReservationApp() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
-  // Save reservation (add or edit) - simplified
-  function saveReservation(e?: React.FormEvent) {
+  // Save reservation (add or edit) using Supabase
+  async function saveReservation(e?: React.FormEvent) {
     if (e) e.preventDefault();
 
     if (!formData.patientName.trim() || !formData.symptom.trim()) {
@@ -535,68 +584,134 @@ export default function HanuiwonReservationApp() {
     }
 
     if (modalMode === "add") {
-      const newRes: Reservation = {
-        id: `RES-${format(new Date(), "yyMMdd")}-${String(Date.now()).slice(-3)}`,
+      const { error } = await supabase.from("reservations").insert({
         date: formData.date,
         time: formData.time,
-        patientName: formData.patientName.trim(),
+        patient_name: formData.patientName.trim(),
         phone: "",
-        birthDate: "",
-        gender: "여", // kept for data compatibility, not shown in UI
+        birth_date: "",
+        gender: "여",
         doctor: "",
         treatment: formData.treatment,
         symptom: formData.symptom.trim(),
-        status: "pending", // always start as 대기 when registering
-        notes: undefined,
-        createdAt: new Date().toISOString(),
-      };
-      setReservations((prev) => [newRes, ...prev]);
+        status: "pending",
+        notes: null,
+      });
+
+      if (error) {
+        toast.error("저장 중 오류가 발생했습니다.");
+        console.error(error);
+        return;
+      }
       toast.success("새 예약이 등록되었습니다.");
     } else if (selectedReservation) {
-      // When editing, preserve original status, gender, doctor, notes
-      setReservations((prev) =>
-        prev.map((r) =>
-          r.id === selectedReservation.id
-            ? {
-                ...r,
-                date: formData.date,
-                time: formData.time,
-                patientName: formData.patientName.trim(),
-                treatment: formData.treatment,
-                symptom: formData.symptom.trim(),
-              }
-            : r
-        )
-      );
+      const { error } = await supabase
+        .from("reservations")
+        .update({
+          date: formData.date,
+          time: formData.time,
+          patient_name: formData.patientName.trim(),
+          treatment: formData.treatment,
+          symptom: formData.symptom.trim(),
+        })
+        .eq("id", selectedReservation.id);
+
+      if (error) {
+        toast.error("수정 중 오류가 발생했습니다.");
+        console.error(error);
+        return;
+      }
       toast.success("예약 정보가 수정되었습니다.");
     }
+
+    // Refetch data
+    const { data } = await supabase
+      .from("reservations")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setReservations(data as Reservation[]);
 
     closeModals();
   }
 
   // Quick status change
-  function changeStatus(id: string, newStatus: Status) {
-    setReservations((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
-    );
+  async function changeStatus(id: string, newStatus: Status) {
+    const { error } = await supabase
+      .from("reservations")
+      .update({ status: newStatus })
+      .eq("id", id);
+
+    if (error) {
+      toast.error("상태 변경 중 오류가 발생했습니다.");
+      console.error(error);
+      return;
+    }
+
+    // Refetch
+    const { data } = await supabase
+      .from("reservations")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setReservations(data as Reservation[]);
+
     const label = STATUS_LABEL[newStatus];
     toast.success(`상태가 "${label}"(으)로 변경되었습니다.`);
   }
 
   // Delete reservation
-  function deleteReservation(id: string) {
+  async function deleteReservation(id: string) {
     if (!confirm("정말 이 예약을 삭제하시겠습니까?")) return;
-    setReservations((prev) => prev.filter((r) => r.id !== id));
+
+    const { error } = await supabase.from("reservations").delete().eq("id", id);
+
+    if (error) {
+      toast.error("삭제 중 오류가 발생했습니다.");
+      console.error(error);
+      return;
+    }
+
+    // Refetch
+    const { data } = await supabase
+      .from("reservations")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setReservations(data as Reservation[]);
+
     setDetailOpen(false);
     toast.error("예약이 삭제되었습니다.");
   }
 
-  // Reset all data to seed
-  function resetToSeed() {
+  // Reset all data to seed (Supabase version)
+  async function resetToSeed() {
     if (!confirm("모든 예약 데이터를 초기 상태로 되돌릴까요?")) return;
+
+    // Delete all current
+    await supabase.from("reservations").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+
     const seed = generateSeedData();
+    const { error } = await supabase.from("reservations").insert(
+      seed.map((s) => ({
+        date: s.date,
+        time: s.time,
+        patient_name: s.patientName,
+        phone: s.phone,
+        birth_date: s.birthDate,
+        gender: s.gender,
+        doctor: s.doctor,
+        treatment: s.treatment,
+        symptom: s.symptom,
+        status: s.status,
+        notes: s.notes,
+      }))
+    );
+
+    if (error) {
+      toast.error("초기화 중 오류가 발생했습니다.");
+      console.error(error);
+      return;
+    }
+
     setReservations(seed);
-    localStorage.setItem("hanui_reservations", JSON.stringify(seed));
     setSearchTerm("");
     setSelectedDate(format(new Date(), "yyyy-MM-dd"));
     toast.info("데이터가 초기화되었습니다.");
@@ -704,6 +819,19 @@ export default function HanuiwonReservationApp() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Supabase connection status - very visible for Vercel debugging */}
+        {supabaseStatus === 'fallback' && (
+          <div className="mb-4 p-4 bg-red-600 text-white rounded-lg text-sm font-bold border-2 border-red-800">
+            ⚠️ Supabase 연결 실패 — 현재 시드(더미) 데이터만 사용 중입니다.<br />
+            <span className="font-normal">Vercel 대시보드 → Project → Settings → Environment Variables 에서 NEXT_PUBLIC_SUPABASE_URL과 NEXT_PUBLIC_SUPABASE_ANON_KEY를 <strong>Production</strong> 환경에 추가하고 Sensitive 체크를 해제한 후 반드시 Redeploy 하세요.</span>
+          </div>
+        )}
+        {supabaseStatus === 'connected' && (
+          <div className="mb-3 p-2 bg-green-600 text-white rounded text-xs text-center font-medium">
+            ✅ Supabase 연동 완료 (모든 데이터가 DB에 저장되며 여러 기기에서 공유됩니다)
+          </div>
+        )}
+
         {/* Page Title - simplified */}
         <div className="mb-5">
           <h1 className="text-3xl font-semibold tracking-tighter text-slate-900">
@@ -793,6 +921,19 @@ export default function HanuiwonReservationApp() {
             진료 시간표 — {format(parseISO(selectedDate), "yyyy년 M월 d일")} ({["일","월","화","수","목","금","토"][parseISO(selectedDate).getDay()]})
           </div>
         </div>
+
+        {/* Warning banner if using seed data (Supabase not connected) - visible on Vercel if env vars missing */}
+        {supabaseStatus === 'fallback' && (
+          <div className="mb-3 p-3 bg-red-600 text-white rounded text-sm font-semibold">
+            ⚠️ Supabase 연결 실패 — 현재 시드(더미) 데이터만 사용 중입니다.<br />
+            Vercel 대시보드에서 NEXT_PUBLIC_SUPABASE_URL과 NEXT_PUBLIC_SUPABASE_ANON_KEY를 <strong>Production</strong> 환경에 추가하고 "Sensitive" 체크를 해제한 후 재배포하세요.
+          </div>
+        )}
+        {supabaseStatus === 'connected' && (
+          <div className="mb-2 p-1 bg-green-600 text-white rounded text-xs text-center">
+            ✅ Supabase 연동 중 (데이터가 DB에 저장됩니다)
+          </div>
+        )}
 
         <div className="mb-2 px-1 flex items-center justify-between">
           <div className="text-sm font-medium text-slate-600">

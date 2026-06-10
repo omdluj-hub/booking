@@ -3,6 +3,11 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { format, parseISO, getDay } from "date-fns";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTAwMDAwMDAsImV4cCI6MTcwMDAwMDAwMH0.placeholder';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 interface Reservation {
   id: string;
@@ -24,16 +29,20 @@ function PrintContent() {
   const isSaturday = getDay(parseISO(selectedDate)) === 6;
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("hanui_reservations");
-      if (saved) {
-        const parsed = JSON.parse(saved) as Reservation[];
-        setReservations(parsed);
+    const load = async () => {
+      const { data, error } = await supabase
+        .from("reservations")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        setReservations(data as Reservation[]);
+      } else if (error) {
+        console.error("Print load error:", error);
       }
-    } catch (e) {
-      console.error("Failed to load reservations for print");
-    }
-    setIsReady(true);
+      setIsReady(true);
+    };
+    load();
   }, []);
 
   const dailyReservations = reservations.filter((r) => r.date === selectedDate);
