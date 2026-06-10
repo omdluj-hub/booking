@@ -58,8 +58,9 @@ function PrintContent() {
 
   const dailyReservations = reservations.filter((r) => r.date === selectedDate);
 
-  // Generate display times (same logic as main app)
-  let sections: { title: string; times: string[] }[] = [];
+  // Generate display times as a flat list for a single unified table.
+  // For weekdays, insert a special divider marker between morning and afternoon.
+  let displayItems: (string | { type: 'divider' })[] = [];
 
   if (isSaturday) {
     const satBase = [
@@ -76,12 +77,7 @@ function PrintContent() {
       ])
     ).sort();
 
-    sections = [
-      {
-        title: "토요일 진료 (09:50 ~ 12:40, 20분 간격)",
-        times: satDisplay,
-      },
-    ];
+    displayItems = satDisplay;
   } else {
     const morningBase = ["10:30", "10:45", "11:00", "11:15", "11:30"];
     const afternoonBase = [
@@ -111,15 +107,10 @@ function PrintContent() {
       ])
     ).sort();
 
-    sections = [
-      {
-        title: "오전 진료 (10:30 ~ 11:30, 15분 간격)",
-        times: morningDisplay,
-      },
-      {
-        title: "오후 진료 (14:00 ~ 19:00, 20분 간격)",
-        times: afternoonDisplay,
-      },
+    displayItems = [
+      ...morningDisplay,
+      { type: 'divider' },
+      ...afternoonDisplay,
     ];
   }
 
@@ -176,66 +167,75 @@ function PrintContent() {
           </div>
         </div>
 
-        {/* Schedule sections */}
-        {sections.map((section, index) => (
-          <div key={index} className="mb-7 print:mb-3">
-            <div className="mb-1.5 text-sm font-semibold text-[#0f766e]">
-              {section.title}
-            </div>
-
-            <table className="w-full border-collapse border border-gray-400 text-[10pt]">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="w-[68px] border border-gray-400 px-3 py-2.5 text-left font-medium">
-                    시간
-                  </th>
-                  <th className="w-20 border border-gray-400 px-3 py-2.5 text-left font-medium">
-                    환자명
-                  </th>
-                  <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
-                    진료내역
-                  </th>
-                  <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
-                    기타
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {section.times.map((time) => {
-                  const slotRes = dailyReservations.filter((r) => r.time === time);
-                  if (slotRes.length === 0) {
-                    return (
-                      <tr key={time} className="align-top">
-                        <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
-                          {time}
-                        </td>
-                        <td className="w-20 border border-gray-300 px-3 py-2.5"></td>
-                        <td className="border border-gray-300 px-3 py-2.5"></td>
-                        <td className="border border-gray-300 px-3 py-2.5"></td>
-                      </tr>
-                    );
-                  }
-                  return slotRes.map((res, idx) => (
-                    <tr key={res.id} className="align-top">
-                      <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
-                        {idx === 0 ? time : ""}
-                      </td>
-                      <td className="w-20 border border-gray-300 px-3 py-2.5">
-                        {res.patientName}
-                      </td>
-                      <td className="border border-gray-300 px-3 py-2.5">
-                        {res.treatment}
-                      </td>
-                      <td className="border border-gray-300 px-3 py-2.5">
-                        {res.symptom}
+        {/* Single unified table for the entire day (consistent column widths) */}
+        <table className="w-full border-collapse border border-gray-400 text-[10pt]">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="w-[68px] border border-gray-400 px-3 py-2.5 text-left font-medium">
+                시간
+              </th>
+              <th className="w-20 border border-gray-400 px-3 py-2.5 text-left font-medium">
+                환자명
+              </th>
+              <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
+                진료내역
+              </th>
+              <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
+                기타
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayItems.map((item, index) => {
+              if (typeof item === 'object' && item.type === 'divider') {
+                // Two-line divider to separate 오전 and 오후 (no separate tables)
+                return (
+                  <React.Fragment key={`divider-${index}`}>
+                    <tr>
+                      <td colSpan={4} className="border-t-2 border-b border-gray-400 py-0"></td>
+                    </tr>
+                    <tr>
+                      <td colSpan={4} className="border-t border-b-2 border-gray-400 py-0 text-center text-[7pt] text-gray-500">
+                        오후 진료
                       </td>
                     </tr>
-                  ));
-                })}
-              </tbody>
-            </table>
-          </div>
-        ))}
+                  </React.Fragment>
+                );
+              }
+
+              const time = item as string;
+              const slotRes = dailyReservations.filter((r) => r.time === time);
+              if (slotRes.length === 0) {
+                return (
+                  <tr key={time} className="align-top">
+                    <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
+                      {time}
+                    </td>
+                    <td className="w-20 border border-gray-300 px-3 py-2.5"></td>
+                    <td className="border border-gray-300 px-3 py-2.5"></td>
+                    <td className="border border-gray-300 px-3 py-2.5"></td>
+                  </tr>
+                );
+              }
+              return slotRes.map((res, idx) => (
+                <tr key={res.id} className="align-top">
+                  <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
+                    {idx === 0 ? time : ""}
+                  </td>
+                  <td className="w-20 border border-gray-300 px-3 py-2.5">
+                    {res.patientName}
+                  </td>
+                  <td className="border border-gray-300 px-3 py-2.5">
+                    {res.treatment}
+                  </td>
+                  <td className="border border-gray-300 px-3 py-2.5">
+                    {res.symptom}
+                  </td>
+                </tr>
+              ));
+            })}
+          </tbody>
+        </table>
 
         <div className="mt-3 print:mt-1 text-center text-[9pt] text-gray-500">
           본 시간표는 내부 참고용입니다.
