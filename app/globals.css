@@ -168,6 +168,14 @@ select.input {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
 }
 
+/* Hour separator: clean single thick line, matching screen and print */
+.hour-separator .separator-cell {
+  border-top: 4px solid #444;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
 /* Print styles for clean timetable output */
 @media print {
   .no-print {
@@ -216,5 +224,19 @@ select.input {
 
   th, td {
     padding: 3px 4px !important;
+  }
+
+  /* Force hour separators to render as clean single thick lines in print,
+     exactly matching the screen preview (no "line inside cell" effect). */
+  .hour-separator .separator-cell {
+    border-top: 4px solid #444 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+    margin: 0 !important;
+  }
+
+  .hour-separator td {
+    border: none !important;
   }
 }

@@ -157,12 +157,11 @@ function PrintContent() {
     const hour = parseInt(time.split(':')[0], 10);
 
     if (prevHour !== null && hour !== prevHour) {
-      // 굵은 선 하나로만 시간 단위 구분 (단일 tr, inner div로 깔끔한 한 줄)
+      // Clean single thick line separator for hourly groups.
+      // Uses dedicated class so we can force identical rendering in screen + print.
       tableRows.push(
-        <tr key={`hour-${index}`}>
-          <td colSpan={4} className="p-0 border-0">
-            <div className="border-t-4 border-gray-400" />
-          </td>
+        <tr key={`hour-${index}`} className="hour-separator">
+          <td colSpan={4} className="separator-cell p-0 border-0"></td>
         </tr>
       );
     }
