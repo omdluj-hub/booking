@@ -588,19 +588,14 @@ export default function HanuiwonReservationApp() {
         date: formData.date,
         time: formData.time,
         patient_name: formData.patientName.trim(),
-        phone: "",
-        birth_date: "",
-        gender: "여",
-        doctor: "",
         treatment: formData.treatment,
         symptom: formData.symptom.trim(),
         status: "pending",
-        notes: null,
       });
 
       if (error) {
-        toast.error("저장 중 오류가 발생했습니다.");
-        console.error(error);
+        toast.error(`등록에 실패했습니다: ${error.message || error}`);
+        console.error("Supabase insert error:", error);
         return;
       }
       toast.success("새 예약이 등록되었습니다.");
@@ -617,8 +612,8 @@ export default function HanuiwonReservationApp() {
         .eq("id", selectedReservation.id);
 
       if (error) {
-        toast.error("수정 중 오류가 발생했습니다.");
-        console.error(error);
+        toast.error(`수정에 실패했습니다: ${error.message || error}`);
+        console.error("Supabase update error:", error);
         return;
       }
       toast.success("예약 정보가 수정되었습니다.");
@@ -642,8 +637,8 @@ export default function HanuiwonReservationApp() {
       .eq("id", id);
 
     if (error) {
-      toast.error("상태 변경 중 오류가 발생했습니다.");
-      console.error(error);
+      toast.error(`상태 변경에 실패했습니다: ${error.message || error}`);
+      console.error("Supabase status update error:", error);
       return;
     }
 
@@ -665,8 +660,8 @@ export default function HanuiwonReservationApp() {
     const { error } = await supabase.from("reservations").delete().eq("id", id);
 
     if (error) {
-      toast.error("삭제 중 오류가 발생했습니다.");
-      console.error(error);
+      toast.error(`삭제에 실패했습니다: ${error.message || error}`);
+      console.error("Supabase delete error:", error);
       return;
     }
 
