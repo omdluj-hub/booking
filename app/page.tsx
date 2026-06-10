@@ -768,43 +768,45 @@ export default function HanuiwonReservationApp() {
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur no-print">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 min-h-16 py-1 sm:py-0 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#0f766e] flex items-center justify-center">
               <Calendar className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <div className="font-semibold text-xl tracking-tighter text-slate-900">
+            <div className="min-w-0">
+              <div className="font-semibold text-base sm:text-xl tracking-tighter text-slate-900 whitespace-nowrap">
                 후한의원 구미점
               </div>
-              <div className="text-[11px] text-slate-500 -mt-1">예약 관리 시스템</div>
+              <div className="text-[10px] sm:text-[11px] text-slate-500 -mt-1">예약 관리 시스템</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-3">
             <button
               onClick={openAddModal}
-              className="flex items-center gap-2 bg-[#0f766e] hover:bg-[#115e59] active:bg-[#134e4b] text-white px-4 h-10 rounded-xl text-sm font-semibold transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 bg-[#0f766e] hover:bg-[#115e59] active:bg-[#134e4b] text-white px-2 sm:px-4 h-9 sm:h-10 rounded-xl text-xs sm:text-sm font-semibold transition-colors"
             >
               <Plus className="w-4 h-4" />
-              새 예약 등록
+              <span className="hidden sm:inline">새 예약 등록</span>
+              <span className="sm:hidden">등록</span>
             </button>
             <button
               onClick={exportCSV}
-              className="flex items-center gap-2 border border-slate-200 hover:bg-slate-50 px-4 h-10 rounded-xl text-sm font-medium text-slate-700 transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 border border-slate-200 hover:bg-slate-50 px-2 sm:px-4 h-9 sm:h-10 rounded-xl text-xs sm:text-sm font-medium text-slate-700 transition-colors"
             >
               <Download className="w-4 h-4" />
-              CSV 내보내기
+              <span className="hidden sm:inline">CSV 내보내기</span>
+              <span className="sm:hidden">CSV</span>
             </button>
             <button
               onClick={() => window.open(`/print?date=${selectedDate}`, '_blank')}
-              className="flex items-center gap-2 border border-slate-200 hover:bg-slate-50 px-4 h-10 rounded-xl text-sm font-medium text-slate-700 transition-colors"
+              className="flex items-center gap-1.5 sm:gap-2 border border-slate-200 hover:bg-slate-50 px-2 sm:px-4 h-9 sm:h-10 rounded-xl text-xs sm:text-sm font-medium text-slate-700 transition-colors"
             >
               인쇄
             </button>
             <button
               onClick={resetToSeed}
-              className="text-xs text-slate-400 hover:text-slate-500 px-2 py-1"
+              className="text-[10px] sm:text-xs text-slate-400 hover:text-slate-500 px-1.5 sm:px-2 py-1"
               title="데이터 초기화"
             >
               초기화
@@ -911,7 +913,7 @@ export default function HanuiwonReservationApp() {
         {/* Time-based Schedule Table */}
         {/* Print-only header - shows nicely when printing */}
         <div className="hidden print:block text-center mb-4 border-b pb-3">
-          <div className="text-2xl font-bold tracking-tighter">후한의원 구미점</div>
+          <div className="text-xl sm:text-2xl font-bold tracking-tighter whitespace-nowrap">후한의원 구미점</div>
           <div className="text-base mt-1">
             진료 시간표 — {format(parseISO(selectedDate), "yyyy년 M월 d일")} ({["일","월","화","수","목","금","토"][parseISO(selectedDate).getDay()]})
           </div>
