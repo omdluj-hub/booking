@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 우리한의원 예약 관리 시스템
 
-## Getting Started
+한의원에서 예약 내역을 쉽고 빠르게 확인하고 관리할 수 있는 웹 애플리케이션입니다.
 
-First, run the development server:
+## 주요 기능
+
+- **예약 목록 조회**: 날짜, 환자명, 연락처, 상태 등으로 빠르게 검색 및 필터링
+- **실시간 상태 관리**: 대기 → 확정 → 완료, 취소 등 버튼 한 번으로 상태 변경
+- **새 예약 등록 / 수정**: 상세 정보 입력 모달 (담당의, 진료내용, 증상, 메모 포함)
+- **상세 보기**: 환자 정보와 메모 확인 + 빠른 액션 버튼
+- **통계 카드**: 오늘 예약, 대기/확정 건수, 최근 완료 건수 등 한눈에
+- **CSV 내보내기**: 현재 필터링된 목록을 엑셀에서 열 수 있는 CSV로 다운로드
+- **로컬 저장**: 브라우저 localStorage에 자동 저장 (새로고침해도 유지)
+- **초기화 버튼**: 테스트용으로 언제든 샘플 데이터로 되돌리기 가능
+
+## 시작하기
 
 ```bash
+# 개발 서버 실행
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 http://localhost:3000 접속
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 프로덕션 빌드
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## 사용 팁
 
-To learn more about Next.js, take a look at the following resources:
+- 상단 **"새 예약 등록"** 버튼으로 바로 예약을 추가할 수 있습니다.
+- 테이블의 **"상세"** 버튼 또는 각 행의 상태 버튼(완료/확정/취소)을 이용하세요.
+- 검색창에 환자명 또는 전화번호 뒷자리를 입력하면 바로 필터됩니다.
+- 날짜 범위 + 상태 필터를 조합해서 원하는 예약만 볼 수 있습니다.
+- **CSV 내보내기**로 회계/보고용으로 활용 가능합니다.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 기술 스택
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Next.js 16 (App Router)
+- TypeScript + Tailwind CSS
+- lucide-react 아이콘, date-fns, sonner 토스트
 
-## Deploy on Vercel
+## 데이터 저장 방식
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+현재 모든 데이터는 **브라우저 localStorage**에만 저장됩니다.  
+실제 병원에서 사용하려면 나중에 Supabase, Firebase, 또는 자체 백엔드 API로 교체하면 됩니다.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+한의원 실무에서 바로 쓸 수 있는 가벼운 예약 확인 도구로 만들었습니다. 추가 기능(캘린더 뷰, 환자별 이력, SMS 연동 등)이 필요하시면 말씀해주세요!
