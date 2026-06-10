@@ -665,7 +665,7 @@ export default function HanuiwonReservationApp() {
             </div>
             <div>
               <div className="font-semibold text-xl tracking-tighter text-slate-900">
-                우리한의원
+                후한의원 구미점
               </div>
               <div className="text-[11px] text-slate-500 -mt-1">예약 관리 시스템</div>
             </div>
@@ -788,7 +788,7 @@ export default function HanuiwonReservationApp() {
         {/* Time-based Schedule Table */}
         {/* Print-only header - shows nicely when printing */}
         <div className="hidden print:block text-center mb-4 border-b pb-3">
-          <div className="text-2xl font-bold tracking-tighter">우리한의원</div>
+          <div className="text-2xl font-bold tracking-tighter">후한의원 구미점</div>
           <div className="text-base mt-1">
             진료 시간표 — {format(parseISO(selectedDate), "yyyy년 M월 d일")} ({["일","월","화","수","목","금","토"][parseISO(selectedDate).getDay()]})
           </div>
@@ -896,7 +896,7 @@ export default function HanuiwonReservationApp() {
                 <div className="font-semibold text-lg">
                   {modalMode === "add" ? "새 예약 등록" : "예약 정보 수정"}
                 </div>
-                <div className="text-xs text-slate-500">우리한의원</div>
+                <div className="text-xs text-slate-500">후한의원 구미점</div>
               </div>
               <button onClick={closeModals} className="p-1 text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
@@ -1239,7 +1239,7 @@ export default function HanuiwonReservationApp() {
 
       {/* Footer */}
       <footer className="max-w-7xl mx-auto px-6 py-8 text-center text-xs text-slate-400">
-        우리한의원 예약 관리 시스템 · 내부용 · 데이터는 브라우저에만 저장됩니다
+        후한의원 구미점 예약 관리 시스템 · 내부용
       </footer>
     </div>
   );

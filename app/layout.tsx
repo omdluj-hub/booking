@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "우리한의원 | 예약 관리",
-  description: "우리한의원 예약 내역 확인 및 관리 시스템",
+  title: "후한의원 구미점 | 예약 관리",
+  description: "후한의원 구미점 예약 내역 확인 및 관리 시스템",
   icons: {
     icon: "/favicon.ico",
   },

@@ -149,7 +149,7 @@ function PrintContent() {
       <div className="mx-auto max-w-[210mm] print-area">
         {/* Print header */}
         <div className="mb-4 text-center">
-          <div className="text-xl font-bold tracking-tighter">우리한의원</div>
+          <div className="text-xl font-bold tracking-tighter">후한의원 구미점</div>
           <div className="mt-0.5 text-sm font-semibold">
             진료 시간표 — {formattedDate} ({weekday})
           </div>
