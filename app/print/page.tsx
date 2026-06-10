@@ -36,7 +36,18 @@ function PrintContent() {
         .order("created_at", { ascending: false });
 
       if (data) {
-        setReservations(data as Reservation[]);
+        // Map snake_case from DB to camelCase used in UI
+        setReservations(
+          data.map((row: any) => ({
+            id: row.id,
+            date: row.date,
+            time: row.time,
+            patientName: row.patient_name,
+            treatment: row.treatment,
+            symptom: row.symptom,
+            status: row.status,
+          }))
+        );
       } else if (error) {
         console.error("Print load error:", error);
       }

@@ -50,185 +50,6 @@ const STATUS_COLOR: Record<Status, string> = {
 
 const TREATMENTS = ["피부", "다이어트", "자보", "기타"];
 
-// Generate realistic seed data
-function generateSeedData(): Reservation[] {
-  const today = new Date();
-  const seed: Reservation[] = [
-    {
-      id: "RES-250409-001",
-      date: format(subDays(today, 2), "yyyy-MM-dd"),
-      time: "09:30",
-      patientName: "김영희",
-      phone: "010-2345-6789",
-      birthDate: "1978-05-12",
-      gender: "여",
-      doctor: "김민수 한의사",
-      treatment: "침구치료",
-      symptom: "허리 통증, 좌골신경통",
-      status: "completed",
-      notes: "3회차 치료. 호전 중",
-      createdAt: format(subDays(today, 3), "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-002",
-      date: format(subDays(today, 1), "yyyy-MM-dd"),
-      time: "10:00",
-      patientName: "박철수",
-      phone: "010-3456-7890",
-      birthDate: "1965-11-03",
-      gender: "남",
-      doctor: "이서현 한의사",
-      treatment: "한약 처방",
-      symptom: "소화불량, 피로감",
-      status: "completed",
-      createdAt: format(subDays(today, 2), "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-003",
-      date: format(today, "yyyy-MM-dd"),
-      time: "09:00",
-      patientName: "정미경",
-      phone: "010-4567-8901",
-      birthDate: "1982-02-28",
-      gender: "여",
-      doctor: "박준호 한의사",
-      treatment: "추나요법",
-      symptom: "목·어깨 결림",
-      status: "confirmed",
-      createdAt: format(subDays(today, 1), "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-004",
-      date: format(today, "yyyy-MM-dd"),
-      time: "10:30",
-      patientName: "이준호",
-      phone: "010-5678-9012",
-      birthDate: "1990-07-15",
-      gender: "남",
-      doctor: "김민수 한의사",
-      treatment: "침구치료",
-      symptom: "만성 두통",
-      status: "confirmed",
-      createdAt: format(subDays(today, 1), "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-005",
-      date: format(today, "yyyy-MM-dd"),
-      time: "14:00",
-      patientName: "최수진",
-      phone: "010-6789-0123",
-      birthDate: "1975-09-22",
-      gender: "여",
-      doctor: "이서현 한의사",
-      treatment: "뜸·부항",
-      symptom: "생리통, 하복부 냉증",
-      status: "pending",
-      createdAt: format(today, "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-006",
-      date: format(addDays(today, 1), "yyyy-MM-dd"),
-      time: "11:00",
-      patientName: "한상민",
-      phone: "010-7890-1234",
-      birthDate: "1988-04-05",
-      gender: "남",
-      doctor: "박준호 한의사",
-      treatment: "약침치료",
-      symptom: "무릎 관절염",
-      status: "confirmed",
-      notes: "MRI 결과 확인 필요",
-      createdAt: format(today, "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-007",
-      date: format(addDays(today, 1), "yyyy-MM-dd"),
-      time: "15:30",
-      patientName: "송지은",
-      phone: "010-8901-2345",
-      birthDate: "2001-12-11",
-      gender: "여",
-      doctor: "김민수 한의사",
-      treatment: "침구치료",
-      symptom: "스트레스성 불면",
-      status: "pending",
-      createdAt: format(today, "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-008",
-      date: format(subDays(today, 4), "yyyy-MM-dd"),
-      time: "16:00",
-      patientName: "오태현",
-      phone: "010-9012-3456",
-      birthDate: "1962-08-19",
-      gender: "남",
-      doctor: "이서현 한의사",
-      treatment: "한방물리치료",
-      symptom: "어깨 회전근개 손상",
-      status: "completed",
-      createdAt: format(subDays(today, 5), "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-009",
-      date: format(addDays(today, 2), "yyyy-MM-dd"),
-      time: "09:30",
-      patientName: "윤아름",
-      phone: "010-0123-4567",
-      birthDate: "1995-03-30",
-      gender: "여",
-      doctor: "박준호 한의사",
-      treatment: "상담 및 진찰",
-      symptom: "체중 감량 상담 (한약)",
-      status: "confirmed",
-      createdAt: format(today, "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-010",
-      date: format(subDays(today, 3), "yyyy-MM-dd"),
-      time: "13:30",
-      patientName: "강동현",
-      phone: "010-1234-5678",
-      birthDate: "1970-01-25",
-      gender: "남",
-      doctor: "김민수 한의사",
-      treatment: "한약 처방",
-      symptom: "고혈압 관리",
-      status: "cancelled",
-      notes: "환자 사정으로 취소",
-      createdAt: format(subDays(today, 4), "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-011",
-      date: format(today, "yyyy-MM-dd"),
-      time: "16:30",
-      patientName: "임혜진",
-      phone: "010-2345-6780",
-      birthDate: "1984-06-08",
-      gender: "여",
-      doctor: "이서현 한의사",
-      treatment: "추나요법",
-      symptom: "골반 틀어짐, 요통",
-      status: "pending",
-      createdAt: format(today, "yyyy-MM-dd'T'HH:mm"),
-    },
-    {
-      id: "RES-250409-012",
-      date: format(addDays(today, 3), "yyyy-MM-dd"),
-      time: "10:00",
-      patientName: "조민수",
-      phone: "010-3456-7891",
-      birthDate: "1958-10-14",
-      gender: "남",
-      doctor: "박준호 한의사",
-      treatment: "침구치료",
-      symptom: "퇴행성 관절염",
-      status: "confirmed",
-      createdAt: format(addDays(today, -1), "yyyy-MM-dd'T'HH:mm"),
-    },
-  ];
-  return seed;
-}
-
 // Helpers
 function formatDateTime(dateStr: string, timeStr: string): string {
   try {
@@ -362,40 +183,15 @@ export default function HanuiwonReservationApp() {
 
       if (error) {
         console.error("Error loading reservations from Supabase:", error);
-        const seed = generateSeedData();
-        setReservations(seed);
+        setReservations([]);
         setSupabaseStatus('fallback');
         setIsLoaded(true);
         return;
       }
 
-      if (data && data.length > 0) {
-        setReservations(data.map(mapSupabaseRow));
-        setSupabaseStatus('connected');
-      } else {
-        // First time: insert seed data to Supabase
-        const seed = generateSeedData();
-        const { error: insertError } = await supabase.from("reservations").insert(
-          seed.map((s) => ({
-            date: s.date,
-            time: s.time,
-            patient_name: s.patientName,
-            phone: s.phone,
-            birth_date: s.birthDate,
-            gender: s.gender,
-            doctor: s.doctor,
-            treatment: s.treatment,
-            symptom: s.symptom,
-            status: s.status,
-            notes: s.notes,
-          }))
-        );
-        if (insertError) {
-          console.error("Seed insert error:", insertError);
-        }
-        setReservations(seed.map(mapSupabaseRow));
-        setSupabaseStatus('connected');
-      }
+      // No seed data — start completely empty or with whatever is in the DB
+      setReservations((data || []).map(mapSupabaseRow));
+      setSupabaseStatus('connected');
       setIsLoaded(true);
     };
 
@@ -610,7 +406,7 @@ export default function HanuiwonReservationApp() {
       .from("reservations")
       .select("*")
       .order("created_at", { ascending: false });
-    if (data) setReservations(data as Reservation[]);
+    if (data) setReservations(data.map(mapSupabaseRow));
 
     closeModals();
   }
@@ -633,7 +429,7 @@ export default function HanuiwonReservationApp() {
       .from("reservations")
       .select("*")
       .order("created_at", { ascending: false });
-    if (data) setReservations(data as Reservation[]);
+    if (data) setReservations(data.map(mapSupabaseRow));
 
     const label = STATUS_LABEL[newStatus];
     toast.success(`상태가 "${label}"(으)로 변경되었습니다.`);
@@ -656,45 +452,35 @@ export default function HanuiwonReservationApp() {
       .from("reservations")
       .select("*")
       .order("created_at", { ascending: false });
-    if (data) setReservations(data as Reservation[]);
+    if (data) setReservations(data.map(mapSupabaseRow));
 
     setDetailOpen(false);
     toast.error("예약이 삭제되었습니다.");
   }
 
-  // Reset all data to seed (Supabase version)
-  async function resetToSeed() {
-    if (!confirm("모든 예약 데이터를 초기 상태로 되돌릴까요?")) return;
+  // Reset only today's reservations (completely empty, no seed re-insertion)
+  async function resetTodayReservations() {
+    if (!confirm(`${format(parseISO(selectedDate), "M월 d일")} 예약 내역을 모두 삭제할까요?`)) return;
 
-    // Delete all current
-    await supabase.from("reservations").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-
-    const seed = generateSeedData();
-    const { error } = await supabase.from("reservations").insert(
-      seed.map((s) => ({
-        date: s.date,
-        time: s.time,
-        patient_name: s.patientName,
-        phone: s.phone,
-        birth_date: s.birthDate,
-        gender: s.gender,
-        doctor: s.doctor,
-        treatment: s.treatment,
-        symptom: s.symptom,
-        status: s.status,
-        notes: s.notes,
-      }))
-    );
+    const { error } = await supabase
+      .from("reservations")
+      .delete()
+      .eq("date", selectedDate);
 
     if (error) {
-      toast.error("초기화 중 오류가 발생했습니다.");
-      console.error(error);
+      toast.error(`초기화에 실패했습니다: ${error.message || error}`);
+      console.error("Supabase reset error:", error);
       return;
     }
 
-    setReservations(seed);
-    setSelectedDate(format(new Date(), "yyyy-MM-dd"));
-    toast.info("데이터가 초기화되었습니다.");
+    // Refetch (map properly so camelCase fields work)
+    const { data } = await supabase
+      .from("reservations")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (data) setReservations(data.map(mapSupabaseRow));
+
+    toast.success("해당 일자의 예약 내역이 삭제되었습니다.");
   }
 
   // Export current day's reservations to CSV (simple)
@@ -790,11 +576,11 @@ export default function HanuiwonReservationApp() {
               인쇄
             </button>
             <button
-              onClick={resetToSeed}
+              onClick={resetTodayReservations}
               className="text-[10px] sm:text-xs text-slate-400 hover:text-slate-500 px-1.5 sm:px-2 py-1"
-              title="데이터 초기화"
+              title="해당 일자의 예약 내역 초기화"
             >
-              초기화
+              오늘 예약 내역 초기화
             </button>
           </div>
         </div>
@@ -804,7 +590,7 @@ export default function HanuiwonReservationApp() {
         {/* Supabase connection status - very visible for Vercel debugging */}
         {supabaseStatus === 'fallback' && (
           <div className="mb-4 p-4 bg-red-600 text-white rounded-lg text-sm font-bold border-2 border-red-800">
-            ⚠️ Supabase 연결 실패 — 현재 시드(더미) 데이터만 사용 중입니다.<br />
+            ⚠️ Supabase 연결 실패 — 데이터를 불러오지 못했습니다 (빈 상태).<br />
             <span className="font-normal">Vercel 대시보드 → Project → Settings → Environment Variables 에서 NEXT_PUBLIC_SUPABASE_URL과 NEXT_PUBLIC_SUPABASE_ANON_KEY를 <strong>Production</strong> 환경에 추가하고 Sensitive 체크를 해제한 후 반드시 Redeploy 하세요.</span>
           </div>
         )}
@@ -883,10 +669,10 @@ export default function HanuiwonReservationApp() {
           </div>
         </div>
 
-        {/* Warning banner if using seed data (Supabase not connected) - visible on Vercel if env vars missing */}
+        {/* Warning banner (Supabase not connected) - visible on Vercel if env vars missing */}
         {supabaseStatus === 'fallback' && (
           <div className="mb-3 p-3 bg-red-600 text-white rounded text-sm font-semibold">
-            ⚠️ Supabase 연결 실패 — 현재 시드(더미) 데이터만 사용 중입니다.<br />
+            ⚠️ Supabase 연결 실패 — 데이터를 불러오지 못했습니다 (빈 상태).<br />
             Vercel 대시보드에서 NEXT_PUBLIC_SUPABASE_URL과 NEXT_PUBLIC_SUPABASE_ANON_KEY를 <strong>Production</strong> 환경에 추가하고 "Sensitive" 체크를 해제한 후 재배포하세요.
           </div>
         )}
