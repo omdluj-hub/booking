@@ -10,6 +10,7 @@ import {
   Download,
   X,
   Calendar,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -72,30 +73,31 @@ export default function PatientRecordsPage() {
   const [selectedPatientName, setSelectedPatientName] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<"recent" | "count" | "name">("recent");
 
+  // Reusable loader (used on initial mount and after patient deletion)
+  const loadReservations = async () => {
+    const { data, error } = await supabase
+      .from("reservations")
+      .select("*")
+      .order("date", { ascending: false })
+      .order("time", { ascending: false });
+
+    if (error) {
+      console.error("Error loading patient data from Supabase:", error);
+      setReservations([]);
+      setSupabaseStatus("fallback");
+      setIsLoaded(true);
+      return;
+    }
+
+    const mapped = (data || []).map(mapSupabaseRow);
+    setReservations(mapped);
+    setSupabaseStatus("connected");
+    setIsLoaded(true);
+  };
+
   // Load all reservations from Supabase (no seed data)
   useEffect(() => {
-    const loadAll = async () => {
-      const { data, error } = await supabase
-        .from("reservations")
-        .select("*")
-        .order("date", { ascending: false })
-        .order("time", { ascending: false });
-
-      if (error) {
-        console.error("Error loading patient data from Supabase:", error);
-        setReservations([]);
-        setSupabaseStatus("fallback");
-        setIsLoaded(true);
-        return;
-      }
-
-      const mapped = (data || []).map(mapSupabaseRow);
-      setReservations(mapped);
-      setSupabaseStatus("connected");
-      setIsLoaded(true);
-    };
-
-    loadAll();
+    loadReservations();
   }, []);
 
   // Aggregate into patient records
@@ -257,6 +259,36 @@ export default function PatientRecordsPage() {
     URL.revokeObjectURL(url);
 
     toast.success(`${selectedPatient.name} 환자의 ${rows.length}건 내역을 CSV로 내보냈습니다.`);
+  }
+
+  // Delete ALL reservations for a patient (by exact patient_name)
+  async function deletePatient(name: string) {
+    const count = selectedPatient?.visitCount ?? 0;
+    if (
+      !confirm(
+        `${name} 환자의 모든 예약 내역(${count}회)을 영구 삭제하시겠습니까?\n\n` +
+          "이 작업은 되돌릴 수 없으며, Supabase에서 해당 환자의 모든 기록이 완전히 제거됩니다."
+      )
+    ) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("reservations")
+      .delete()
+      .eq("patient_name", name);
+
+    if (error) {
+      toast.error(`삭제에 실패했습니다: ${error.message || error}`);
+      console.error("Supabase patient delete error:", error);
+      return;
+    }
+
+    // Refetch to refresh the patient list (removes the patient entirely)
+    await loadReservations();
+
+    setSelectedPatientName(null);
+    toast.success(`${name} 환자의 모든 예약 내역이 삭제되었습니다.`);
   }
 
   function closeDetail() {
@@ -551,6 +583,12 @@ export default function PatientRecordsPage() {
                   className="flex-1 sm:flex-none px-4 h-10 rounded-xl border text-sm font-medium hover:bg-white flex items-center justify-center gap-1.5"
                 >
                   <Download className="w-4 h-4" /> 이 환자 CSV
+                </button>
+                <button
+                  onClick={() => selectedPatient && deletePatient(selectedPatient.name)}
+                  className="flex-1 sm:flex-none px-4 h-10 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-sm font-medium flex items-center justify-center gap-1.5"
+                >
+                  <Trash2 className="w-4 h-4" /> 환자 삭제
                 </button>
                 <Link
                   href="/"
