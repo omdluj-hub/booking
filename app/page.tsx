@@ -774,7 +774,7 @@ export default function HanuiwonReservationApp() {
               <Calendar className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0">
-              <div className="font-semibold text-base sm:text-xl tracking-tighter text-slate-900 whitespace-nowrap">
+              <div className="font-semibold text-base sm:text-xl tracking-tighter text-slate-900 whitespace-nowrap break-keep">
                 후한의원 구미점
               </div>
               <div className="text-[10px] sm:text-[11px] text-slate-500 -mt-1">예약 관리 시스템</div>
