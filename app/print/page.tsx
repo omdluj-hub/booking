@@ -186,14 +186,17 @@ function PrintContent() {
             <table className="w-full border-collapse border border-gray-400 text-[10pt]">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="w-[68px] border border-gray-400 px-3 py-2 text-left font-medium">
+                  <th className="w-[68px] border border-gray-400 px-3 py-2.5 text-left font-medium">
                     시간
                   </th>
-                  <th className="border border-gray-400 px-3 py-2 text-left font-medium">
+                  <th className="w-20 border border-gray-400 px-3 py-2.5 text-left font-medium">
                     환자명
                   </th>
-                  <th className="border border-gray-400 px-3 py-2 text-left font-medium">
+                  <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
                     진료내역
+                  </th>
+                  <th className="border border-gray-400 px-3 py-2.5 text-left font-medium">
+                    기타
                   </th>
                 </tr>
               </thead>
@@ -203,24 +206,28 @@ function PrintContent() {
                   if (slotRes.length === 0) {
                     return (
                       <tr key={time} className="align-top">
-                        <td className="border border-gray-300 px-3 py-2 font-mono text-[10pt]">
+                        <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
                           {time}
                         </td>
-                        <td className="border border-gray-300 px-3 py-2"></td>
-                        <td className="border border-gray-300 px-3 py-2"></td>
+                        <td className="w-20 border border-gray-300 px-3 py-2.5"></td>
+                        <td className="border border-gray-300 px-3 py-2.5"></td>
+                        <td className="border border-gray-300 px-3 py-2.5"></td>
                       </tr>
                     );
                   }
                   return slotRes.map((res, idx) => (
                     <tr key={res.id} className="align-top">
-                      <td className="border border-gray-300 px-3 py-2 font-mono text-[10pt]">
+                      <td className="border border-gray-300 px-3 py-2.5 font-mono text-[10pt]">
                         {idx === 0 ? time : ""}
                       </td>
-                      <td className="border border-gray-300 px-3 py-2">
+                      <td className="w-20 border border-gray-300 px-3 py-2.5">
                         {res.patientName}
                       </td>
-                      <td className="border border-gray-300 px-3 py-2">
-                        {`${res.treatment} · ${res.symptom}`}
+                      <td className="border border-gray-300 px-3 py-2.5">
+                        {res.treatment}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2.5">
+                        {res.symptom}
                       </td>
                     </tr>
                   ));
