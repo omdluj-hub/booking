@@ -240,10 +240,18 @@ select.input {
     border: none !important;
   }
 
-  /* Preserve header background color in print to match screen preview exactly */
+  /* Preserve the exact header row background (light gray like bg-gray-100 on screen)
+     so the printed table header cells look identical to the on-screen preview.
+     Multiple selectors + !important + print-color-adjust to force background printing. */
+  .print-area table thead tr,
+  .print-area table thead tr.bg-gray-100,
+  .print-area table thead th,
+  .print-area table tr.bg-gray-100 th,
   tr.bg-gray-100,
-  tr.bg-gray-100 th {
-    background-color: #f3f4f6 !important; /* Tailwind gray-100 */
+  tr.bg-gray-100 th,
+  thead tr.bg-gray-100,
+  thead th {
+    background-color: #f3f4f6 !important; /* matches Tailwind gray-100 */
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
