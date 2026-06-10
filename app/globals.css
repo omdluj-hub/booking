@@ -239,4 +239,12 @@ select.input {
   .hour-separator td {
     border: none !important;
   }
+
+  /* Preserve header background color in print to match screen preview exactly */
+  tr.bg-gray-100,
+  tr.bg-gray-100 th {
+    background-color: #f3f4f6 !important; /* Tailwind gray-100 */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
