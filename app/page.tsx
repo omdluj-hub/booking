@@ -219,15 +219,15 @@ export default function HanuiwonReservationApp() {
   let sections = [];
 
   if (isSaturday) {
-    // Saturday: 09:50, 10:00, then 15-min up to 12:30
-    const satBase = ['09:50', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30'];
+    // Saturday: 09:50, 10:00, then 20-min intervals up to 12:40
+    const satBase = ['09:50', '10:00', '10:20', '10:40', '11:00', '11:20', '11:40', '12:00', '12:20', '12:40'];
     const satDisplay = Array.from(new Set([
       ...satBase,
       ...allBookedTimesThisDay.filter(t => t >= '09:00' && t <= '13:00')
     ])).sort();
     sections = [
       {
-        title: '토요일 진료 (09:50 ~ 12:30, 15분 간격)',
+        title: '토요일 진료 (09:50 ~ 12:40, 20분 간격)',
         times: satDisplay
       }
     ];

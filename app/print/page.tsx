@@ -63,8 +63,9 @@ function PrintContent() {
 
   if (isSaturday) {
     const satBase = [
-      "09:50", "10:00", "10:15", "10:30", "10:45",
-      "11:00", "11:15", "11:30", "11:45", "12:00", "12:15", "12:30",
+      "09:50", "10:00", "10:20", "10:40",
+      "11:00", "11:20", "11:40",
+      "12:00", "12:20", "12:40",
     ];
     const satDisplay = Array.from(
       new Set([
@@ -77,7 +78,7 @@ function PrintContent() {
 
     sections = [
       {
-        title: "토요일 진료 (09:50 ~ 12:30, 15분 간격)",
+        title: "토요일 진료 (09:50 ~ 12:40, 20분 간격)",
         times: satDisplay,
       },
     ];
