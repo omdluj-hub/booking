@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import {
   Plus,
   Download,
@@ -10,6 +11,7 @@ import {
   Trash2,
   X,
   Eye,
+  Users,
 } from "lucide-react";
 import { format, parseISO, addDays, subDays, startOfMonth, endOfMonth, addMonths, subMonths, getDay } from "date-fns";
 import { toast } from "sonner";
@@ -589,6 +591,14 @@ export default function HanuiwonReservationApp() {
             >
               인쇄
             </button>
+            <Link
+              href="/patients"
+              className="flex items-center gap-1.5 sm:gap-2 border border-slate-200 hover:bg-slate-50 px-2 sm:px-4 h-9 sm:h-10 rounded-xl text-xs sm:text-sm font-medium text-slate-700 transition-colors"
+            >
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">환자 내역</span>
+              <span className="sm:hidden">환자</span>
+            </Link>
             <button
               onClick={resetTodayReservations}
               className="text-[10px] sm:text-xs text-slate-400 hover:text-slate-500 px-1.5 sm:px-2 py-1"
