@@ -283,6 +283,20 @@ export default function HanuiwonReservationApp() {
     return { total, pending, confirmed, completed };
   }, [dailyReservations]);
 
+  // Patient previous visit history (for auto-suggest in add modal)
+  const patientHistory = useMemo(() => {
+    const name = formData.patientName.trim().toLowerCase();
+    if (!name) return [];
+    return reservations
+      .filter((r) => r.patientName.trim().toLowerCase() === name)
+      .sort((a, b) => {
+        // Most recent first (by date desc, then time desc)
+        if (a.date !== b.date) return b.date.localeCompare(a.date);
+        return b.time.localeCompare(a.time);
+      })
+      .slice(0, 3);
+  }, [reservations, formData.patientName]);
+
   // Day navigation
   function goToPrevDay() {
     const prev = format(subDays(parseISO(selectedDate), 1), "yyyy-MM-dd");
@@ -972,6 +986,44 @@ export default function HanuiwonReservationApp() {
                   required
                 />
               </div>
+
+              {/* Previous reservations for this patient (shown while typing in add mode) */}
+              {modalMode === "add" && patientHistory.length > 0 && (
+                <div className="mt-1 mb-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs">
+                  <div className="mb-1 flex items-center gap-1 font-medium text-slate-600">
+                    <Clock className="h-3.5 w-3.5" />
+                    최근 예약 내역 (최근 3회)
+                  </div>
+                  <div className="space-y-0.5">
+                    {patientHistory.map((h) => {
+                      const d = parseISO(h.date);
+                      const weekday = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+                      const shortDate = format(d, "yy.MM.dd");
+                      return (
+                        <div
+                          key={h.id}
+                          onClick={() => {
+                            updateForm("treatment", h.treatment);
+                            updateForm("symptom", h.symptom);
+                          }}
+                          className="flex cursor-pointer items-center gap-2 rounded px-1 py-0.5 text-slate-700 transition-colors hover:bg-white active:bg-slate-100"
+                          title="클릭하면 진료내용과 기타를 이 기록으로 채웁니다"
+                        >
+                          <span className="shrink-0 font-mono text-[10px] tabular-nums text-slate-500">
+                            {shortDate} ({weekday}) {h.time}
+                          </span>
+                          <span className="min-w-0 flex-1 truncate">
+                            {h.treatment} · {h.symptom}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-1 text-[10px] text-slate-400">
+                    이전 진료 내용을 참고하세요
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1.5">진료 내용</label>
